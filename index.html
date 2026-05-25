@@ -91,7 +91,7 @@ body{
 .product-description{
   font-size:14px;
   color:#666;
-  min-height:50px;
+  min-height:60px;
 }
 
 .product-price{
@@ -146,20 +146,6 @@ body{
   border-color:#0d6efd;
 }
 
-/* ========================================= */
-/* JSON */
-/* ========================================= */
-
-.json-box{
-  background:#111;
-  color:#00ff88;
-  padding:20px;
-  border-radius:15px;
-  max-height:300px;
-  overflow:auto;
-  font-size:13px;
-}
-
 </style>
 
 </head>
@@ -200,7 +186,7 @@ id="categoryFilter"
 
 </div>
 
-<!-- PRODUCTO -->
+<!-- NUEVO PRODUCTO -->
 <div class="col-md-3">
 
 <button
@@ -214,7 +200,7 @@ onclick="openAddModal()"
 
 </div>
 
-<!-- CATEGORIA -->
+<!-- NUEVA CATEGORIA -->
 <div class="col-md-3">
 
 <button
@@ -226,7 +212,6 @@ onclick="addCategory()"
 
 </button>
 
-<!-- DESCARGAR -->
 <button
 class="btn btn-success btn-lg w-100 mt-3"
 onclick="downloadCatalog()"
@@ -245,18 +230,6 @@ Descargar Catálogo
 <!-- PRODUCTOS -->
 
 <div class="row g-4" id="productsContainer"></div>
-
-<!-- JSON -->
-
-<div class="mt-5">
-
-<h3 class="mb-3">
-JSON Local Guardado
-</h3>
-
-<div class="json-box" id="jsonViewer"></div>
-
-</div>
 
 </div>
 
@@ -390,7 +363,7 @@ Descripción
 
 <textarea
 class="form-control"
-rows="3"
+rows="4"
 id="productDescription"
 ></textarea>
 
@@ -475,6 +448,15 @@ Guardar Producto
 <script>
 
 /* ========================================= */
+/* LIMPIAR CACHE LOCAL */
+/* ========================================= */
+
+localStorage.removeItem("productos");
+localStorage.removeItem("categorias");
+
+
+
+/* ========================================= */
 /* CATEGORIAS */
 /* ========================================= */
 
@@ -505,11 +487,12 @@ let productos = [
 "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=1200&auto=format&fit=crop"
 ]
 },
+
 {
 "id": 1779678328792,
 "nombre": "Marca: ZGHNP",
-"descripcion": "Mocasines de piel de charol negro para hombre, zapatos de vestir con borla, suela antideslizante con punta redonda, zapatos formales para negocios y trabajo diario",
-"precio": "$1,111",
+"descripcion": "Mocasines de piel de charol negro para hombre, zapatos elegantes premium.",
+"precio": "$1,111 MXN",
 "categoria": "ZAPATOS",
 "imagenes": [
 "https://m.media-amazon.com/images/I/61d3-tZpqcL._AC_SY575_.jpg",
@@ -517,11 +500,12 @@ let productos = [
 "https://m.media-amazon.com/images/I/61et0b0C6+L._AC_SY575_.jpg"
 ]
 },
+
 {
 "id": 1779679045817,
 "nombre": "Lavadora Midea",
-"descripcion": "Lavadora Midea Semiautomática Dos Tinas 22Kg Twin Force Pulsator Blanca; MT100W220/W-MX; Impulsor De Doble Fuerza",
-"precio": "$6,453",
+"descripcion": "Lavadora Midea Semiautomática Dos Tinas 22Kg Twin Force Pulsator Blanca.",
+"precio": "$6,453 MXN",
 "categoria": "Lavadoras",
 "imagenes": [
 "https://m.media-amazon.com/images/I/4175gTG1YCL._AC_SX679_.jpg",
@@ -529,11 +513,12 @@ let productos = [
 "https://m.media-amazon.com/images/I/614KYnjoKIL._AC_SX679_.jpg"
 ]
 },
+
 {
 "id": 1779683269057,
-"nombre": "Lavadora Mirage LMS013M-L de 13 Kg semiautomática de doble tina.",
-"descripcion": "Características principales\nCapacidad de lavado: 13 kg\nTipo: Semiautomática\nSistema: Doble tina\nCentrifugado: 4.6 kg\nFiltro atrapa pelusa\nTemporizador de lavado y secado\nLavado intenso y regular\nColor blanco\nBajo nivel de ruido",
-"precio": "$2,757.00",
+"nombre": "Lavadora Mirage",
+"descripcion": "Lavadora Mirage LMS013M-L de 13 Kg semiautomática de doble tina.",
+"precio": "$2,757 MXN",
 "categoria": "Lavadoras",
 "imagenes": [
 "https://plomerama.b-cdn.net/wp-content/uploads/2025/10/LMS016M-01-1024x1024-1.jpg",
@@ -543,77 +528,6 @@ let productos = [
 }
 
 ];
-
-
-
-/* ========================================= */
-/* CARGAR JSON */
-/* ========================================= */
-
-const savedProducts =
-localStorage.getItem("productos");
-
-const savedCategories =
-localStorage.getItem("categorias");
-
-
-if(savedProducts){
-
-productos =
-JSON.parse(savedProducts);
-
-}
-
-
-if(savedCategories){
-
-categorias =
-JSON.parse(savedCategories);
-
-}
-
-
-
-/* ========================================= */
-/* GUARDAR JSON */
-/* ========================================= */
-
-function saveToJSON(){
-
-localStorage.setItem(
-  "productos",
-  JSON.stringify(productos)
-);
-
-localStorage.setItem(
-  "categorias",
-  JSON.stringify(categorias)
-);
-
-updateJSONViewer();
-
-}
-
-
-
-/* ========================================= */
-/* VER JSON */
-/* ========================================= */
-
-function updateJSONViewer(){
-
-const data = {
-
-  categorias,
-  productos
-
-};
-
-document.getElementById("jsonViewer")
-.innerText =
-JSON.stringify(data,null,2);
-
-}
 
 
 
@@ -629,7 +543,6 @@ document.getElementById("categoryFilter");
 const productCategory =
 document.getElementById("productCategory");
 
-
 categoryFilter.innerHTML = `
 <option value="Todos">
 Todas las categorías
@@ -637,7 +550,6 @@ Todas las categorías
 `;
 
 productCategory.innerHTML = "";
-
 
 categorias.forEach(cat => {
 
@@ -670,31 +582,26 @@ function renderProducts(){
 const container =
 document.getElementById("productsContainer");
 
-
 const search =
 document
 .getElementById("searchInput")
 .value
 .toLowerCase();
 
-
 const category =
 document
 .getElementById("categoryFilter")
 .value;
 
-
 let filtered =
 productos.filter(producto => {
 
 const matchesSearch =
-
 producto.nombre
 .toLowerCase()
 .includes(search);
 
 const matchesCategory =
-
 category === "Todos" ||
 producto.categoria === category;
 
@@ -702,11 +609,7 @@ return matchesSearch && matchesCategory;
 
 });
 
-
-
 container.innerHTML = "";
-
-
 
 filtered.forEach((producto,index) => {
 
@@ -726,7 +629,6 @@ onclick="openGallery(${index})"
 
 <div class="product-category">
 
-Línea Blanca /
 ${producto.categoria}
 
 </div>
@@ -792,8 +694,7 @@ document.getElementById("modalPrice")
 .innerText = producto.precio;
 
 document.getElementById("modalCategory")
-.innerText =
-"Línea Blanca / " + producto.categoria;
+.innerText = producto.categoria;
 
 const mainImage =
 document.getElementById("mainImage");
@@ -839,8 +740,6 @@ mainImage.style.transform =
 
 
 let thumbs = "";
-
-
 
 producto.imagenes.forEach(img => {
 
@@ -910,8 +809,6 @@ document.getElementById("productPrice")
 document.getElementById("productImages")
 .value = "";
 
-
-
 let modal =
 new bootstrap.Modal(
 document.getElementById("productModal")
@@ -954,8 +851,6 @@ document.getElementById("productCategory")
 document.getElementById("productImages")
 .value =
 producto.imagenes.join("\n");
-
-
 
 let modal =
 new bootstrap.Modal(
@@ -1031,17 +926,11 @@ productos[index] = producto;
 
 
 
-saveToJSON();
-
-
-
 bootstrap.Modal
 .getInstance(
 document.getElementById("productModal")
 )
 .hide();
-
-
 
 renderProducts();
 
@@ -1052,7 +941,7 @@ renderProducts();
 
 
 /* ========================================= */
-/* AGREGAR CATEGORIA */
+/* NUEVA CATEGORIA */
 /* ========================================= */
 
 function addCategory(){
@@ -1060,18 +949,12 @@ function addCategory(){
 let nuevaCategoria =
 prompt("Ingresa el nombre de la nueva categoría");
 
-
-
 if(
-
 nuevaCategoria &&
 !categorias.includes(nuevaCategoria)
-
 ){
 
 categorias.push(nuevaCategoria);
-
-saveToJSON();
 
 renderCategories();
 
@@ -1104,10 +987,6 @@ let html = `
 
 <style>
 
-/* ========================================= */
-/* HOJA CARTA */
-/* ========================================= */
-
 @page{
 size:Letter portrait;
 margin:10mm;
@@ -1119,10 +998,6 @@ padding:0;
 font-family:'Segoe UI',sans-serif;
 background:#dcdcdc;
 }
-
-/* ========================================= */
-/* PAGINA */
-/* ========================================= */
 
 .page{
 
@@ -1141,10 +1016,6 @@ page-break-after:always;
 
 }
 
-/* ========================================= */
-/* TITULO */
-/* ========================================= */
-
 .catalog-title{
 
 text-align:center;
@@ -1156,10 +1027,6 @@ font-weight:bold;
 margin-bottom:25px;
 
 }
-
-/* ========================================= */
-/* CATEGORIA */
-/* ========================================= */
 
 .category-title{
 
@@ -1175,10 +1042,6 @@ margin-bottom:25px;
 
 }
 
-/* ========================================= */
-/* GRID PRODUCTOS */
-/* ========================================= */
-
 .products-grid{
 
 display:grid;
@@ -1188,10 +1051,6 @@ grid-template-columns:1fr 1fr;
 gap:20px;
 
 }
-
-/* ========================================= */
-/* TARJETA */
-/* ========================================= */
 
 .product-card{
 
@@ -1211,10 +1070,6 @@ flex-direction:column;
 
 }
 
-/* ========================================= */
-/* IMAGEN */
-/* ========================================= */
-
 .product-image{
 
 width:100%;
@@ -1231,10 +1086,6 @@ box-sizing:border-box;
 
 }
 
-/* ========================================= */
-/* INFO */
-/* ========================================= */
-
 .product-info{
 
 padding:20px;
@@ -1247,10 +1098,6 @@ flex:1;
 
 }
 
-/* ========================================= */
-/* CATEGORIA TEXTO */
-/* ========================================= */
-
 .product-category{
 
 font-size:13px;
@@ -1260,10 +1107,6 @@ color:#777;
 margin-bottom:12px;
 
 }
-
-/* ========================================= */
-/* NOMBRE */
-/* ========================================= */
 
 .product-name{
 
@@ -1277,10 +1120,6 @@ color:#111;
 
 }
 
-/* ========================================= */
-/* DESCRIPCION */
-/* ========================================= */
-
 .product-description{
 
 font-size:14px;
@@ -1293,10 +1132,6 @@ flex:1;
 
 }
 
-/* ========================================= */
-/* PRECIO */
-/* ========================================= */
-
 .product-price{
 
 font-size:26px;
@@ -1308,10 +1143,6 @@ color:#198754;
 margin-top:20px;
 
 }
-
-/* ========================================= */
-/* IMPRESION */
-/* ========================================= */
 
 @media print{
 
@@ -1375,18 +1206,15 @@ html += `
 
 <div class="product-card">
 
-<!-- IMAGEN -->
 <img
 src="${producto.imagenes[0]}"
 class="product-image"
 >
 
-<!-- INFO -->
 <div class="product-info">
 
 <div class="product-category">
 
-Línea Blanca /
 ${producto.categoria}
 
 </div>
@@ -1445,25 +1273,18 @@ html += `
 const blob =
 new Blob([html], {type:"text/html"});
 
-
-
 const link =
 document.createElement("a");
-
-
 
 link.href =
 URL.createObjectURL(blob);
 
 link.download =
-"catalogo-profesional-hoja-carta.html";
-
-
+"catalogo-profesional.html";
 
 link.click();
 
 }
-
 
 
 
@@ -1475,9 +1296,6 @@ link.click();
 document
 .getElementById("searchInput")
 .addEventListener("input", renderProducts);
-
-
-
 
 document
 .getElementById("categoryFilter")
@@ -1491,12 +1309,7 @@ document
 /* ========================================= */
 
 renderCategories();
-
 renderProducts();
-
-updateJSONViewer();
-
-saveToJSON();
 
 </script>
 
