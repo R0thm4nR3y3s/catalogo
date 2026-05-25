@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Catálogo Profesional</title>
+
+<!-- BOOTSTRAP -->
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet"
+>
+
+<style>
+
+body{
+  background:#f5f5f5;
+  font-family:'Segoe UI', sans-serif;
+}
+
+/* ========================================= */
+/* TITULO */
+/* ========================================= */
+
+.titulo{
+  font-size:40px;
+  font-weight:bold;
+  text-align:center;
+  margin-bottom:40px;
+  color:#111;
+}
+
+/* ========================================= */
+/* FILTROS */
+/* ========================================= */
+
+.filters{
+  background:#fff;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,.08);
+  margin-bottom:40px;
+}
+
+/* ========================================= */
+/* TARJETAS */
+/* ========================================= */
+
+.product-card{
+  background:#fff;
+  border-radius:20px;
+  overflow:hidden;
+  transition:.3s;
+  box-shadow:0 5px 15px rgba(0,0,0,.08);
+  height:100%;
+}
+
+.product-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.product-img{
+  width:100%;
+  height:260px;
+  object-fit:contain;
+  background:#fff;
+  padding:15px;
+  cursor:pointer;
+}
+
+.product-info{
+  padding:20px;
+}
+
+.product-category{
+  font-size:13px;
+  color:#666;
+  margin-bottom:10px;
+}
+
+.product-name{
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.product-description{
+  font-size:14px;
+  color:#666;
+  min-height:50px;
+}
+
+.product-price{
+  font-size:30px;
+  color:#198754;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+.btn-edit{
+  width:100%;
+  margin-top:15px;
+}
+
+/* ========================================= */
+/* ZOOM */
+/* ========================================= */
+
+.zoom-container{
+  overflow:hidden;
+  border-radius:15px;
+  background:#fff;
+  position:relative;
+  cursor:zoom-in;
+}
+
+.main-image{
+  width:100%;
+  height:450px;
+  object-fit:contain;
+  transition:transform .15s ease;
+  transform-origin:center center;
+}
+
+.thumbs{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+
+.thumbs img{
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  border-radius:10px;
+  cursor:pointer;
+  border:2px solid transparent;
+}
+
+.thumbs img:hover{
+  border-color:#0d6efd;
+}
+
+/* ========================================= */
+/* JSON */
+/* ========================================= */
+
+.json-box{
+  background:#111;
+  color:#00ff88;
+  padding:20px;
+  border-radius:15px;
+  max-height:300px;
+  overflow:auto;
+  font-size:13px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+<h1 class="titulo">
+Catálogo de Productos
+</h1>
+
+<!-- FILTROS -->
+
+<div class="filters">
+
+<div class="row g-3">
+
+<!-- BUSCADOR -->
+<div class="col-md-3">
+
+<input
+type="text"
+class="form-control form-control-lg"
+placeholder="Buscar..."
+id="searchInput"
+>
+
+</div>
+
+<!-- CATEGORIAS -->
+<div class="col-md-3">
+
+<select
+class="form-select form-select-lg"
+id="categoryFilter"
+></select>
+
+</div>
+
+<!-- PRODUCTO -->
+<div class="col-md-3">
+
+<button
+class="btn btn-primary btn-lg w-100"
+onclick="openAddModal()"
+>
+
++ Producto
+
+</button>
+
+</div>
+
+<!-- CATEGORIA -->
+<div class="col-md-3">
+
+<button
+class="btn btn-dark btn-lg w-100"
+onclick="addCategory()"
+>
+
++ Categoría
+
+</button>
+
+<!-- DESCARGAR -->
+<button
+class="btn btn-success btn-lg w-100 mt-3"
+onclick="downloadCatalog()"
+>
+
+Descargar Catálogo
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- PRODUCTOS -->
+
+<div class="row g-4" id="productsContainer"></div>
+
+<!-- JSON -->
+
+<div class="mt-5">
+
+<h3 class="mb-3">
+JSON Local Guardado
+</h3>
+
+<div class="json-box" id="jsonViewer"></div>
+
+</div>
+
+</div>
+
+
+
+
+<!-- ========================================= -->
+<!-- MODAL GALERIA -->
+<!-- ========================================= -->
+
+<div class="modal fade" id="galleryModal" tabindex="-1">
+
+<div class="modal-dialog modal-xl modal-dialog-centered">
+
+<div class="modal-content">
+
+<div class="modal-header border-0">
+
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
+
+</div>
+
+<div class="modal-body p-4 pt-0">
+
+<div class="row">
+
+<!-- IMAGEN -->
+<div class="col-lg-7">
+
+<div class="zoom-container">
+
+<img
+id="mainImage"
+class="main-image"
+>
+
+</div>
+
+<div class="thumbs" id="thumbContainer"></div>
+
+</div>
+
+<!-- INFO -->
+<div class="col-lg-5 d-flex flex-column justify-content-center">
+
+<div
+class="text-secondary mb-2"
+id="modalCategory"
+></div>
+
+<h2 id="modalTitle"></h2>
+
+<p
+class="mt-3 text-secondary"
+id="modalDescription"
+></p>
+
+<div
+class="product-price"
+id="modalPrice"
+></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+
+<!-- ========================================= -->
+<!-- MODAL PRODUCTO -->
+<!-- ========================================= -->
+
+<div class="modal fade" id="productModal" tabindex="-1">
+
+<div class="modal-dialog modal-lg">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h4 id="modalFormTitle">
+Agregar Producto
+</h4>
+
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
+
+</div>
+
+<div class="modal-body">
+
+<input type="hidden" id="productIndex">
+
+<!-- NOMBRE -->
+<div class="mb-3">
+
+<label class="form-label">
+Nombre
+</label>
+
+<input
+type="text"
+class="form-control"
+id="productName"
+>
+
+</div>
+
+<!-- DESCRIPCION -->
+<div class="mb-3">
+
+<label class="form-label">
+Descripción
+</label>
+
+<textarea
+class="form-control"
+rows="3"
+id="productDescription"
+></textarea>
+
+</div>
+
+<!-- PRECIO -->
+<div class="mb-3">
+
+<label class="form-label">
+Precio
+</label>
+
+<input
+type="text"
+class="form-control"
+id="productPrice"
+>
+
+</div>
+
+<!-- CATEGORIA -->
+<div class="mb-3">
+
+<label class="form-label">
+Categoría
+</label>
+
+<select
+class="form-select"
+id="productCategory"
+></select>
+
+</div>
+
+<!-- IMAGENES -->
+<div class="mb-3">
+
+<label class="form-label">
+URLs de imágenes
+</label>
+
+<textarea
+class="form-control"
+rows="5"
+id="productImages"
+placeholder="Una URL por línea"
+></textarea>
+
+</div>
+
+</div>
+
+<div class="modal-footer">
+
+<button
+class="btn btn-success"
+onclick="saveProduct()"
+>
+
+Guardar Producto
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+
+<!-- BOOTSTRAP -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+<script>
+
+/* ========================================= */
+/* CATEGORIAS */
+/* ========================================= */
+
+let categorias = [
+
+"Lavadoras",
+"Refrigeradores",
+"Lavasecadoras"
+
+];
+
+
+/* ========================================= */
+/* PRODUCTOS */
+/* ========================================= */
+
+let productos = [
+
+{
+  id:1,
+
+  categoria:"Lavadoras",
+
+  nombre:"Lavadora Automática 18Kg",
+
+  descripcion:"Lavadora moderna y ahorradora.",
+
+  precio:"$5,990 MXN",
+
+  imagenes:[
+
+    "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=1200&auto=format&fit=crop",
+
+    "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=1200&auto=format&fit=crop"
+
+  ]
+}
+
+];
+
+
+
+/* ========================================= */
+/* CARGAR JSON */
+/* ========================================= */
+
+const savedProducts =
+localStorage.getItem("productos");
+
+const savedCategories =
+localStorage.getItem("categorias");
+
+
+if(savedProducts){
+
+productos =
+JSON.parse(savedProducts);
+
+}
+
+
+if(savedCategories){
+
+categorias =
+JSON.parse(savedCategories);
+
+}
+
+
+
+/* ========================================= */
+/* GUARDAR JSON */
+/* ========================================= */
+
+function saveToJSON(){
+
+localStorage.setItem(
+  "productos",
+  JSON.stringify(productos)
+);
+
+localStorage.setItem(
+  "categorias",
+  JSON.stringify(categorias)
+);
+
+updateJSONViewer();
+
+}
+
+
+
+/* ========================================= */
+/* VER JSON */
+/* ========================================= */
+
+function updateJSONViewer(){
+
+const data = {
+
+  categorias,
+  productos
+
+};
+
+document.getElementById("jsonViewer")
+.innerText =
+JSON.stringify(data,null,2);
+
+}
+
+
+
+/* ========================================= */
+/* RENDER CATEGORIAS */
+/* ========================================= */
+
+function renderCategories(){
+
+const categoryFilter =
+document.getElementById("categoryFilter");
+
+const productCategory =
+document.getElementById("productCategory");
+
+
+categoryFilter.innerHTML = `
+<option value="Todos">
+Todas las categorías
+</option>
+`;
+
+productCategory.innerHTML = "";
+
+
+categorias.forEach(cat => {
+
+categoryFilter.innerHTML += `
+<option value="${cat}">
+${cat}
+</option>
+`;
+
+productCategory.innerHTML += `
+<option value="${cat}">
+${cat}
+</option>
+`;
+
+});
+
+}
+
+
+
+
+
+/* ========================================= */
+/* MOSTRAR PRODUCTOS */
+/* ========================================= */
+
+function renderProducts(){
+
+const container =
+document.getElementById("productsContainer");
+
+
+const search =
+document
+.getElementById("searchInput")
+.value
+.toLowerCase();
+
+
+const category =
+document
+.getElementById("categoryFilter")
+.value;
+
+
+let filtered =
+productos.filter(producto => {
+
+const matchesSearch =
+
+producto.nombre
+.toLowerCase()
+.includes(search);
+
+const matchesCategory =
+
+category === "Todos" ||
+producto.categoria === category;
+
+return matchesSearch && matchesCategory;
+
+});
+
+
+
+container.innerHTML = "";
+
+
+
+filtered.forEach((producto,index) => {
+
+container.innerHTML += `
+
+<div class="col-md-4">
+
+<div class="product-card">
+
+<img
+src="${producto.imagenes[0]}"
+class="product-img"
+onclick="openGallery(${index})"
+>
+
+<div class="product-info">
+
+<div class="product-category">
+
+Línea Blanca /
+${producto.categoria}
+
+</div>
+
+<div class="product-name">
+
+${producto.nombre}
+
+</div>
+
+<div class="product-description">
+
+${producto.descripcion}
+
+</div>
+
+<div class="product-price">
+
+${producto.precio}
+
+</div>
+
+<button
+class="btn btn-warning btn-edit"
+onclick="editProduct(${index})"
+>
+
+Editar Producto
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+
+
+/* ========================================= */
+/* GALERIA */
+/* ========================================= */
+
+function openGallery(index){
+
+const producto = productos[index];
+
+document.getElementById("modalTitle")
+.innerText = producto.nombre;
+
+document.getElementById("modalDescription")
+.innerText = producto.descripcion;
+
+document.getElementById("modalPrice")
+.innerText = producto.precio;
+
+document.getElementById("modalCategory")
+.innerText =
+"Línea Blanca / " + producto.categoria;
+
+const mainImage =
+document.getElementById("mainImage");
+
+mainImage.src =
+producto.imagenes[0];
+
+
+
+const container =
+document.querySelector(".zoom-container");
+
+
+
+container.onmousemove = function(e){
+
+const rect =
+container.getBoundingClientRect();
+
+const x =
+((e.clientX - rect.left) / rect.width) * 100;
+
+const y =
+((e.clientY - rect.top) / rect.height) * 100;
+
+mainImage.style.transformOrigin =
+`${x}% ${y}%`;
+
+mainImage.style.transform =
+"scale(2)";
+
+};
+
+
+
+container.onmouseleave = function(){
+
+mainImage.style.transform =
+"scale(1)";
+
+};
+
+
+
+let thumbs = "";
+
+
+
+producto.imagenes.forEach(img => {
+
+thumbs += `
+
+<img
+src="${img}"
+onclick="changeImage('${img}')"
+>
+
+`;
+
+});
+
+
+
+document.getElementById("thumbContainer")
+.innerHTML = thumbs;
+
+
+
+let modal =
+new bootstrap.Modal(
+document.getElementById("galleryModal")
+);
+
+modal.show();
+
+}
+
+
+
+
+
+function changeImage(img){
+
+document.getElementById("mainImage")
+.src = img;
+
+}
+
+
+
+
+
+/* ========================================= */
+/* NUEVO PRODUCTO */
+/* ========================================= */
+
+function openAddModal(){
+
+document.getElementById("modalFormTitle")
+.innerText = "Agregar Producto";
+
+document.getElementById("productIndex")
+.value = "";
+
+document.getElementById("productName")
+.value = "";
+
+document.getElementById("productDescription")
+.value = "";
+
+document.getElementById("productPrice")
+.value = "";
+
+document.getElementById("productImages")
+.value = "";
+
+
+
+let modal =
+new bootstrap.Modal(
+document.getElementById("productModal")
+);
+
+modal.show();
+
+}
+
+
+
+
+
+/* ========================================= */
+/* EDITAR */
+/* ========================================= */
+
+function editProduct(index){
+
+const producto = productos[index];
+
+document.getElementById("modalFormTitle")
+.innerText = "Editar Producto";
+
+document.getElementById("productIndex")
+.value = index;
+
+document.getElementById("productName")
+.value = producto.nombre;
+
+document.getElementById("productDescription")
+.value = producto.descripcion;
+
+document.getElementById("productPrice")
+.value = producto.precio;
+
+document.getElementById("productCategory")
+.value = producto.categoria;
+
+document.getElementById("productImages")
+.value =
+producto.imagenes.join("\n");
+
+
+
+let modal =
+new bootstrap.Modal(
+document.getElementById("productModal")
+);
+
+modal.show();
+
+}
+
+
+
+
+
+/* ========================================= */
+/* GUARDAR */
+/* ========================================= */
+
+function saveProduct(){
+
+const index =
+document.getElementById("productIndex")
+.value;
+
+const nombre =
+document.getElementById("productName")
+.value;
+
+const descripcion =
+document.getElementById("productDescription")
+.value;
+
+const precio =
+document.getElementById("productPrice")
+.value;
+
+const categoria =
+document.getElementById("productCategory")
+.value;
+
+const imagenes =
+document
+.getElementById("productImages")
+.value
+.split("\n")
+.filter(img => img.trim() !== "");
+
+
+
+const producto = {
+
+id: Date.now(),
+
+nombre,
+descripcion,
+precio,
+categoria,
+imagenes
+
+};
+
+
+
+if(index === ""){
+
+productos.push(producto);
+
+}else{
+
+productos[index] = producto;
+
+}
+
+
+
+saveToJSON();
+
+
+
+bootstrap.Modal
+.getInstance(
+document.getElementById("productModal")
+)
+.hide();
+
+
+
+renderProducts();
+
+}
+
+
+
+
+
+/* ========================================= */
+/* AGREGAR CATEGORIA */
+/* ========================================= */
+
+function addCategory(){
+
+let nuevaCategoria =
+prompt("Ingresa el nombre de la nueva categoría");
+
+
+
+if(
+
+nuevaCategoria &&
+!categorias.includes(nuevaCategoria)
+
+){
+
+categorias.push(nuevaCategoria);
+
+saveToJSON();
+
+renderCategories();
+
+alert("Categoría agregada correctamente");
+
+}
+
+}
+
+
+
+
+
+/* ========================================= */
+/* DESCARGAR CATALOGO */
+/* ========================================= */
+
+function downloadCatalog(){
+
+let html = `
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Catálogo Profesional</title>
+
+<style>
+
+/* ========================================= */
+/* HOJA CARTA */
+/* ========================================= */
+
+@page{
+size:Letter portrait;
+margin:10mm;
+}
+
+body{
+margin:0;
+padding:0;
+font-family:'Segoe UI',sans-serif;
+background:#dcdcdc;
+}
+
+/* ========================================= */
+/* PAGINA */
+/* ========================================= */
+
+.page{
+
+width:216mm;
+min-height:279mm;
+
+background:#fff;
+
+margin:15px auto;
+
+padding:10mm;
+
+box-sizing:border-box;
+
+page-break-after:always;
+
+}
+
+/* ========================================= */
+/* TITULO */
+/* ========================================= */
+
+.catalog-title{
+
+text-align:center;
+
+font-size:34px;
+
+font-weight:bold;
+
+margin-bottom:25px;
+
+}
+
+/* ========================================= */
+/* CATEGORIA */
+/* ========================================= */
+
+.category-title{
+
+font-size:28px;
+
+font-weight:bold;
+
+border-bottom:4px solid #111;
+
+padding-bottom:10px;
+
+margin-bottom:25px;
+
+}
+
+/* ========================================= */
+/* GRID PRODUCTOS */
+/* ========================================= */
+
+.products-grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:20px;
+
+}
+
+/* ========================================= */
+/* TARJETA */
+/* ========================================= */
+
+.product-card{
+
+border-radius:20px;
+
+overflow:hidden;
+
+border:1px solid #ddd;
+
+background:#fff;
+
+min-height:470px;
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+/* ========================================= */
+/* IMAGEN */
+/* ========================================= */
+
+.product-image{
+
+width:100%;
+
+height:240px;
+
+object-fit:contain;
+
+background:#fff;
+
+padding:15px;
+
+box-sizing:border-box;
+
+}
+
+/* ========================================= */
+/* INFO */
+/* ========================================= */
+
+.product-info{
+
+padding:20px;
+
+display:flex;
+
+flex-direction:column;
+
+flex:1;
+
+}
+
+/* ========================================= */
+/* CATEGORIA TEXTO */
+/* ========================================= */
+
+.product-category{
+
+font-size:13px;
+
+color:#777;
+
+margin-bottom:12px;
+
+}
+
+/* ========================================= */
+/* NOMBRE */
+/* ========================================= */
+
+.product-name{
+
+font-size:22px;
+
+font-weight:bold;
+
+margin-bottom:15px;
+
+color:#111;
+
+}
+
+/* ========================================= */
+/* DESCRIPCION */
+/* ========================================= */
+
+.product-description{
+
+font-size:14px;
+
+color:#555;
+
+line-height:1.5;
+
+flex:1;
+
+}
+
+/* ========================================= */
+/* PRECIO */
+/* ========================================= */
+
+.product-price{
+
+font-size:26px;
+
+font-weight:bold;
+
+color:#198754;
+
+margin-top:20px;
+
+}
+
+/* ========================================= */
+/* IMPRESION */
+/* ========================================= */
+
+@media print{
+
+body{
+background:#fff;
+}
+
+.page{
+margin:0;
+box-shadow:none;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+`;
+
+
+
+categorias.forEach(categoria => {
+
+const productosCategoria =
+productos.filter(
+p => p.categoria === categoria
+);
+
+
+
+if(productosCategoria.length > 0){
+
+html += `
+
+<div class="page">
+
+<div class="catalog-title">
+
+Catálogo de Productos
+
+</div>
+
+<div class="category-title">
+
+${categoria}
+
+</div>
+
+<div class="products-grid">
+
+`;
+
+
+
+productosCategoria.forEach(producto => {
+
+html += `
+
+<div class="product-card">
+
+<!-- IMAGEN -->
+<img
+src="${producto.imagenes[0]}"
+class="product-image"
+>
+
+<!-- INFO -->
+<div class="product-info">
+
+<div class="product-category">
+
+Línea Blanca /
+${producto.categoria}
+
+</div>
+
+<div class="product-name">
+
+${producto.nombre}
+
+</div>
+
+<div class="product-description">
+
+${producto.descripcion}
+
+</div>
+
+<div class="product-price">
+
+${producto.precio}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+
+html += `
+
+</div>
+
+</div>
+
+`;
+
+}
+
+});
+
+
+
+html += `
+
+</body>
+</html>
+
+`;
+
+
+
+const blob =
+new Blob([html], {type:"text/html"});
+
+
+
+const link =
+document.createElement("a");
+
+
+
+link.href =
+URL.createObjectURL(blob);
+
+link.download =
+"catalogo-profesional-hoja-carta.html";
+
+
+
+link.click();
+
+}
+
+
+
+
+
+/* ========================================= */
+/* EVENTOS */
+/* ========================================= */
+
+document
+.getElementById("searchInput")
+.addEventListener("input", renderProducts);
+
+
+
+
+document
+.getElementById("categoryFilter")
+.addEventListener("change", renderProducts);
+
+
+
+
+/* ========================================= */
+/* INICIO */
+/* ========================================= */
+
+renderCategories();
+
+renderProducts();
+
+updateJSONViewer();
+
+saveToJSON();
+
+</script>
+
+</body>
+
+</html>
